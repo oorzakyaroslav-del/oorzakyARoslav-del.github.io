@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ВНИМАНИЕ!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #d10000; /* Красный фон */
+            width: 100%;
+            padding: 30px 20px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .timer-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ffcc00; /* Желтый цвет таймера */
+        }
+        .sub-text {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+            border: none;
+            outline: none;
+        }
+        button {
+            background-color: #111;
+            color: white;
+            border: 1px solid #333;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            gap: 10px;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        .tg-link {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🔒 ВНИМАНИЕ!</h1>
+        <h2>ВСЕ ТВОИ ФАЙЛЫ БЫЛИ ЗАШИФРОВАНЫ!</h2>
+        
+        <div class="timer-text">⏱ ОСТАЛОСЬ: <span id="timer">05:00</span></div>
+        
+        <div class="sub-text">ВВЕДИ ПАРОЛЬ ЧТОБЫ ВОССТАНОВИТЬ ДОСТУП</div>
+        
+        <input type="text" placeholder="Введите код..." autocomplete="off">
+        <br>
+        <button onclick="showMessage()">🔒 РАЗБЛОКИРОВАТЬ</button>
+        
+        <!-- Измененная ссылка на ваш Telegram -->
+        <a href="https://t.me/GRAM1448" class="tg-link" target="_blank">
+            ✈ пиши в тг @GRAM1448
+        </a>
+    </div>
+
+    <script>
+        // Таймер на 5 минут (300 секунд)
+        let timeLeft = 300; 
+        const timerElement = document.getElementById('timer');
+
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.innerText = "00:00";
+                return;
+            }
+            timeLeft--;
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerElement.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        function showMessage() {
+            alert("Это всего лишь пранк! Твои файлы в безопасности. 😉");
+        }
+    </script>
+</body>
+</html
