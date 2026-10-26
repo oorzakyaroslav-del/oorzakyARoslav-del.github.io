@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PepsisShop</title>
+    <style>
+        :root {
+            --bg-color: #0f0f11;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --accent-green: #00d26a;
+            --accent-purple: #5e5ce6;
+            --accent-gold: #ffcc00;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Модальное окно входа */
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #333; }
+        .login-box h2 { margin-bottom: 20px; color: var(--accent-green); }
+        .login-box input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; outline: none; }
+        .login-box button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent-green); color: #000; font-weight: bold; font-size: 16px; cursor: pointer; }
+        
+        /* Модальное окно оплаты */
+        .pay-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .pay-box { background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #333; position: relative; }
+        .close-pay { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }
+        .pay-box h2 { margin-bottom: 10px; color: var(--accent-green); }
+        .pay-box p { color: #aaa; margin-bottom: 20px; font-size: 14px; }
+        .card-number { background: #000; border: 2px dashed var(--accent-green); padding: 15px; border-radius: 10px; font-size: 20px; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; color: #fff; }
+        .copy-btn { background: var(--accent-green); color: #000; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 10px; }
+        .tg-btn { background: #2AABEE; color: #fff; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 16px; cursor: pointer; display: block; text-decoration: none; box-sizing: border-box; }
+
+        /* Верхняя панель */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: sticky; top: 0; background: var(--bg-color); z-index: 10; border-bottom: 1px solid #222; }
+        .header-title { font-size: 20px; font-weight: bold; color: var(--accent-green); }
+        .close-btn { font-size: 24px; color: var(--text-main); cursor: pointer; text-decoration: none; }
+        
+        /* Приветствие */
+        .greeting { padding: 20px; font-size: 24px; font-weight: 800; }
+        
+        /* Карточки */
+        .card { background: var(--card-bg); border-radius: 16px; margin: 0 20px 15px 20px; padding: 15px; display: flex; align-items: center; text-decoration: none; color: inherit; cursor: pointer; }
+        .card-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; flex-shrink: 0; }
+        .icon-green { background: #0a3a20; color: var(--accent-green); }
+        .icon-gold { background: #3a300a; color: var(--accent-gold); }
+        .icon-purple { background: #1c1a3a; color: var(--accent-purple); }
+        
+        .card-content { flex: 1; }
+        .card-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: var(--text-muted); }
+        .arrow { color: var(--text-muted); font-size: 20px; margin-left: 10px; }
+        
+        /* Заголовок секции */
+        .section-title { padding: 20px 20px 10px 20px; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        /* Баланс */
+        .balance-card { background: linear-gradient(135deg, #3b1e75, #1c1a3a); border-radius: 16px; margin: 0 20px 15px 20px; padding: 20px; position: relative; }
+        .balance-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .balance-title { font-size: 16px; font-weight: bold; color: #e0e0e0; }
+        .top-up-btn { background: var(--accent-green); color: #000; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        
+        .balance-amount { font-size: 42px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .balance-sub { font-size: 13px; color: #bbb; margin-bottom: 15px; }
+        .balance-stars { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; }
+        
+        /* Преимущества */
+        .features-row { display: flex; justify-content: space-between; margin: 0 20px 20px 20px; background: var(--card-bg); border-radius: 16px; padding: 15px; text-align: center; }
+        .feature { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .feature-icon { font-size: 20px; margin-bottom: 8px; }
+        .feature-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .feature-sub { font-size: 11px; color: var(--text-muted); }
+        
+        /* Ссылки и кнопки */
+        .link-row { background: var(--card-bg); border-radius: 16px; margin: 0 20px 15px 20px; padding: 15px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: var(--text-main); }
+        .big-green-btn { background: var(--accent-green); border-radius: 16px; margin: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #000; cursor: pointer; }
+        .big-green-text { font-size: 18px; font-weight: bold; }
+        .big-green-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        
+        /* Игровые плитки */
+        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 0 20px 20px 20px; }
+        .game-card { background: var(--card-bg); border-radius: 16px; padding: 15px; text-align: center; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; }
+        .game-icon { font-size: 30px; margin-bottom: 10px; }
+        .game-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .game-price { font-size: 16px; font-weight: bold; color: var(--accent-green); margin-bottom: 10px; }
+        .buy-btn { background: #333; color: #fff; padding: 8px 20px; border-radius: 10px; font-size: 12px; text-decoration: none; border: none; cursor: pointer; }
+        
+        /* Нижняя навигация */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0 20px 0; border-top: 1px solid #333; z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 11px; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-icon { font-size: 20px; }
+        
+        /* Скрываем элементы */
+        .hidden { display: none !important; }
+
+        /* ВАЖНО: CSS-логика входа без JS */
+        #login-check:checked ~ .login-modal { display: none !important; }
+        #login-check:checked ~ #main-content { display: block !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Скрытый чекбокс для работы входа без JS -->
+    <input type="checkbox" id="login-check" style="display: none;">
+
+    <!-- ОКНО ВХОДА -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-box">
+            <h2>Вход в PepsisShop</h2>
+            <p style="color: #888; margin-bottom: 15px; font-size: 14px;">Введите ваше имя или ник</p>
+            <!-- Ввод имени -->
+            <input type="text" id="usernameInput" placeholder="Например: GRAM1448">
+            <!-- Кнопка привязана к чекбоксу, работает без скриптов -->
+            <label for="login-check" style="display: block;">
+                <button type="button" style="pointer-events: none;">Войти</button>
+            </label>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ (Скрыт до входа) -->
+    <div id="main-content" style="display: none;">
+        
+        <!-- ОКНО ОПЛАТЫ -->
+        <div class="pay-modal hidden" id="payModal">
+            <div class="pay-box">
+                <div class="close-pay" onclick="closePay()">×</div>
+                <h2>Оплата заказа</h2>
+                <p>Переведите точную сумму и напишите в поддержку</p>
+                <div class="card-number" id="cardNumber">2202 2088 2584 3189</div>
+                <button class="copy-btn" onclick="copyCard()">Скопировать номер карты</button>
+                <a href="https://t.me/GRAM1448" class="tg-btn">Я оплатил, написать в ТГ</a>
+            </div>
+        </div>
+
+        <!-- ГЛАВНАЯ -->
+        <div id="page-home">
+            <div class="header">
+                <a href="#" class="close-btn">×</a>
+                <div class="header-title">PepsisShop</div>
+                <div class="dots">⋮</div>
+            </div>
+
+            <!-- Блок для вывода имени без JS -->
+            <div class="greeting">
+                Привет, <span id="userNameDisplay">Гость</span>!
+            </div>
+
+            <div class="big-green-btn" onclick="openPay()">
+                <div>
+                    <div class="big-green-text">Пополни баланс, чтобы начать</div>
+                    <div class="big-green-sub">Нажми здесь — выбери сумму и способ</div>
+                </div>
+                <div style="font-size: 30px;">→</div>
+            </div>
+
+            <div class="section-title">Что у нас есть</div>
+            <div class="card" onclick="openPay()">
+                <div class="card-icon icon-green">💎</div>
+                <div class="card-content">
+                    <div class="card-title">Донатик</div>
+                    <div class="card-sub">Донаты и игровая валюта</div>
+                </div>
+            </div>
+            <div class="card" onclick="openPay()">
+                <div class="card-icon icon-gold">👤</div>
+                <div class="card-content">
+                    <div class="card-title">Telegram аккаунты</div>
+                    <div class="card-sub">Готовые аккаунты с автовыдачей</div>
+                </div>
+            </div>
+            <div class="card" onclick="openPay()">
+                <div class="card-icon icon-purple">👑</div>
+                <div class="card-content">
+                    <div class="card-title">Telegram Premium</div>
+                    <div class="card-sub">Telegram Premium от 1000 ₽</div>
+                </div>
+            </div>
+
+            <div class="section-title">Игровая валюта</div>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-icon">🎮</div>
+                    <div class="game-title">Roblox</div>
+                    <div class="game-price">от 100 ₽</div>
+                    <button class="buy-btn" onclick="openPay()">Купить</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon">🔫</div>
+                    <div class="game-title">Standoff 2</div>
+                    <div class="game-price">от 150 ₽</div>
+                    <button class="buy-btn" onclick="openPay()">Купить</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon">🪂</div>
+                    <div class="game-title">PUBG Mobile</div>
+                    <div class="game-price">от 200 ₽</div>
+                    <button class="buy-btn" onclick="openPay()">Купить</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-icon">🧱</div>
+                    <div class="game-title">Minecraft</div>
+                    <div class="game-price">от 250 ₽</div>
+                    <button class="buy-btn" onclick="openPay()">Купить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- БАЛАНС -->
+        <div id="page-balance" class="hidden">
+            <div class="header">
+                <a href="#" class="close-btn">×</a>
+                <div class="header-title">PepsisShop</div>
+            </div>
+            <div class="greeting" id="balanceGreeting">Баланс</div>
+            <div class="balance-card">
+                <div class="balance-top">
+                    <div class="balance-title">✦ Балансы</div>
+                    <div class="top-up-btn" onclick="openPay()">+ Пополнить</div>
+                </div>
+                <div class="balance-amount">0 ₽</div>
+                <div class="balance-sub">основной</div>
+                <div class="balance-stars">⭐ 21</div>
+                <div class="balance-sub">звёздный</div>
+            </div>
+            <div class="section-title">Канал</div>
+            <a href="https://t.me/GRAM1448" class="link-row">
+                <span>@GRAM1448</span>
+            </a>
+        </div>
+
+        <!-- ПРОФИЛЬ -->
+        <div id="page-profile" class="hidden">
+            <div class="header">
+                <a href="#" class="close-btn">×</a>
+                <div class="header-title">PepsisShop</div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <div style="width: 80px; height: 80px; background: var(--card-bg); border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 30px; border: 2px solid var(--accent-green);">✈️</div>
+                <h2 style="margin-top: 10px;" id="profileName">@GRAM1448</h2>
+            </div>
+            <div class="section-title">Связь и помощь</div>
+            <a href="https://t.me/GRAM1448" class="card">
+                <div class="card-icon icon-green">💬</div>
+                <div class="card-content">
+                    <div class="card-title">Поддержка</div>
+                    <div class="card-sub">Написать @GRAM1448</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('home')">
+                <div class="nav-icon">🏠</div>
+                <div>Главная</div>
+            </div>
+            <a href="https://t.me/GRAM1448" class="nav-item">
+                <div class="nav-icon">✈️</div>
+                <div>Telegram</div>
+            </a>
+            <div class="nav-item" onclick="showPage('balance')">
+                <div class="nav-icon">⚡</div>
+                <div>Пополнялка</div>
+            </div>
+            <div class="nav-item" onclick="showPage('profile')">
+                <div class="nav-icon">👤</div>
+                <div>Профиль</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Этот скрипт сработает, если файл открыт по ссылке (на GitHub)
+        // Он берет имя из поля ввода и подставляет его в приветствие
+        document.getElementById('usernameInput').addEventListener('input', function(e) {
+            let name = e.target.value.trim() || "Гость";
+            document.getElementById('userNameDisplay').innerText = name;
+            document.getElementById('balanceGreeting').innerText = name + "!";
+            document.getElementById('profileName').innerText = "@" + name;
+        });
+
+        // Переключение страниц
+        function showPage(page) {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-balance').classList.add('hidden');
+            document.getElementById('page-profile').classList.add('hidden');
+
+            document.getElementById('page-' + page).classList.remove('hidden');
+
+            let navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            if (page === 'home') navItems[0].classList.add('active');
+            if (page === 'balance') navItems[2].classList.add('active');
+            if (page === 'profile') navItems[3].classList.add('active');
+        }
+
+        function openPay() {
+            document.getElementById('payModal').classList.remove('hidden');
+        }
+        function closePay() {
+            document.getElementById('payModal').classList.add('hidden');
+        }
+        function copyCard() {
+            navigator.clipboard.writeText("2202208825843189").then(() => {
+                alert("Номер карты скопирован: 2202 2088 2584 3189");
+            }).catch(err => {
+                alert("Скопируйте вручную: 2202 2088 2584 3189");
+            });
+        }
+    </script>
+</body>
+</html>
