@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pepsis_Shop</title>
+    <style>
+        :root {
+            --bg-color: #0f0f11;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --accent-green: #00d26a;
+            --accent-purple: #5e5ce6;
+            --accent-gold: #ffcc00;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Верхняя панель */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: sticky; top: 0; background: var(--bg-color); z-index: 10; }
+        .header-title { font-size: 20px; font-weight: bold; }
+        .close-btn { font-size: 24px; color: var(--text-main); cursor: pointer; text-decoration: none; }
+        .dots { font-size: 24px; color: var(--text-main); }
+        
+        /* Приветствие */
+        .greeting { padding: 0 20px 15px 20px; font-size: 26px; font-weight: 800; }
+        
+        /* Карточки */
+        .card { background: var(--card-bg); border-radius: 16px; margin: 0 20px 15px 20px; padding: 15px; display: flex; align-items: center; text-decoration: none; color: inherit; }
+        .card-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 15px; }
+        .icon-green { background: #0a3a20; color: var(--accent-green); }
+        .icon-gold { background: #3a300a; color: var(--accent-gold); }
+        .icon-purple { background: #1c1a3a; color: var(--accent-purple); }
+        
+        .card-content { flex: 1; }
+        .card-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: var(--text-muted); }
+        .arrow { color: var(--text-muted); font-size: 20px; margin-left: 10px; }
+        
+        /* Заголовок секции */
+        .section-title { padding: 20px 20px 10px 20px; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        /* Баланс */
+        .balance-card { background: linear-gradient(135deg, #3b1e75, #1c1a3a); border-radius: 16px; margin: 0 20px 15px 20px; padding: 20px; position: relative; }
+        .balance-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .balance-title { font-size: 16px; font-weight: bold; color: #e0e0e0; }
+        .top-up-btn { background: var(--accent-green); color: #000; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        
+        .balance-amount { font-size: 42px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .balance-sub { font-size: 13px; color: #bbb; margin-bottom: 15px; }
+        
+        .balance-stars { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; }
+        
+        /* Преимущества */
+        .features-row { display: flex; justify-content: space-between; margin: 0 20px 20px 20px; background: var(--card-bg); border-radius: 16px; padding: 15px; text-align: center; }
+        .feature { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .feature-icon { font-size: 20px; margin-bottom: 8px; }
+        .feature-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .feature-sub { font-size: 11px; color: var(--text-muted); }
+        
+        /* Ссылки и кнопки */
+        .link-row { background: var(--card-bg); border-radius: 16px; margin: 0 20px 15px 20px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .link-text { font-size: 16px; color: var(--text-main); text-decoration: none; }
+        .link-icon { color: var(--text-muted); font-size: 18px; }
+        
+        .big-green-btn { background: var(--accent-green); border-radius: 16px; margin: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #000; }
+        .big-green-text { font-size: 18px; font-weight: bold; }
+        .big-green-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        .big-green-icon { font-size: 30px; }
+        
+        /* Нижняя навигация */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0 20px 0; border-top: 1px solid #333; z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 11px; gap: 4px; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-icon { font-size: 20px; }
+        
+        /* Сетка профиля */
+        .profile-header { display: flex; align-items: center; gap: 15px; margin: 0 20px 20px 20px; }
+        .profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--card-bg); display: flex; justify-content: center; align-items: center; font-size: 24px; border: 2px solid var(--accent-green); }
+        .profile-name { font-size: 18px; font-weight: bold; }
+        .profile-balance { font-size: 24px; font-weight: bold; }
+        
+        .stats-row { display: flex; justify-content: space-around; margin: 0 20px 20px 20px; background: var(--card-bg); border-radius: 16px; padding: 15px; text-align: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .stat-value { font-weight: bold; font-size: 16px; }
+        .stat-label { font-size: 12px; color: var(--text-muted); }
+        
+        .tabs-row { display: flex; justify-content: space-around; margin: 0 20px 20px 20px; }
+        .tab { padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: bold; color: var(--text-muted); background: transparent; }
+        .tab.active { background: var(--card-bg); color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <!-- ГЛАВНАЯ СТРАНИЦА -->
+    <div id="page-home">
+        <div class="header">
+            <a href="#" class="close-btn">×</a>
+            <div class="header-title">Pepsis_Shop</div>
+            <div class="dots">⋮</div>
+        </div>
+
+        <div class="greeting">Что у нас есть</div>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">💎</div>
+            <div class="card-content">
+                <div class="card-title">Донатик</div>
+                <div class="card-sub">Донаты и игровая валюта: Genshin, Fortnite и другие</div>
+            </div>
+            <div class="arrow">→</div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-gold">👤</div>
+            <div class="card-content">
+                <div class="card-title">Telegram аккаунты</div>
+                <div class="card-sub">Готовые аккаунты с автовыдачей · от 30 ₽</div>
+            </div>
+            <div class="arrow">→</div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-purple">👑</div>
+            <div class="card-content">
+                <div class="card-title">Telegram Premium</div>
+                <div class="card-sub">Telegram Premium от 1000 ₽</div>
+            </div>
+            <div class="arrow">→</div>
+        </a>
+
+        <div class="section-title">⚡ Как это работает</div>
+
+        <div class="card">
+            <div class="card-icon icon-gold" style="border-radius: 50%;">1</div>
+            <div class="card-content">
+                <div class="card-title">Пополни баланс</div>
+                <div class="card-sub">СБП, карта, Telegram Stars, крипта</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-icon icon-green" style="border-radius: 50%;">2</div>
+            <div class="card-content">
+                <div class="card-title">Выбери товар</div>
+                <div class="card-sub">Аккаунт, Premium, игровалюту или услугу</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-icon icon-purple" style="border-radius: 50%;">3</div>
+            <div class="card-content">
+                <div class="card-title">Получи мгновенно</div>
+                <div class="card-sub">Автовыдача — без ожидания</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА БАЛАНСА -->
+    <div id="page-balance" style="display: none;">
+        <div class="header">
+            <a href="#" class="close-btn">×</a>
+            <div class="header-title">Pepsis_Shop</div>
+            <div class="dots">⋮</div>
+        </div>
+
+        <div class="greeting">GRAM1448!</div>
+
+        <div class="balance-card">
+            <div class="balance-top">
+                <div class="balance-title">✦ Балансы</div>
+                <a href="https://t.me/GRAM1448" class="top-up-btn">+ Пополнить</a>
+            </div>
+            <div class="balance-amount">0 ₽</div>
+            <div class="balance-sub">основной</div>
+            <div class="balance-stars">⭐ 0</div>
+            <div class="balance-sub">звёздный</div>
+        </div>
+
+        <div class="features-row">
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-title">Гарантия</div>
+                <div class="feature-sub">На все покупки</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Мгновенно</div>
+                <div class="feature-sub">Автовыдача сразу</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">Поддержка</div>
+                <div class="feature-sub">Отвечаем каждый день</div>
+            </div>
+        </div>
+
+        <div class="greeting" style="font-size: 16px; color: var(--text-muted); padding-bottom: 5px;">Канал</div>
+        <div class="link-row">
+            <a href="https://t.me/GRAM1448" class="link-text">@GRAM1448</a>
+            <div class="link-icon">↗</div>
+        </div>
+
+        <a href="https://t.me/GRAM1448" class="big-green-btn">
+            <div>
+                <div class="big-green-text">Пополни баланс, чтобы начать</div>
+                <div class="big-green-sub">Нажми здесь — выбери сумму и способ</div>
+            </div>
+            <div class="big-green-icon">→</div>
+        </a>
+    </div>
+
+    <!-- СТРАНИЦА ПРОФИЛЯ -->
+    <div id="page-profile" style="display: none;">
+        <div class="header">
+            <a href="#" class="close-btn">×</a>
+            <div class="header-title">Pepsis_Shop</div>
+            <div class="dots">⋮</div>
+        </div>
+
+        <div class="profile-header">
+            <div class="profile-avatar">✈️</div>
+            <div>
+                <div class="profile-name">@GRAM1448</div>
+                <div class="profile-balance">0 ₽</div>
+                <div class="balance-sub">основной</div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-value">↗ 0 ₽</div>
+                <div class="stat-label">Потрачено</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">🛍️ 0</div>
+                <div class="stat-label">Заказов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">👥 0</div>
+                <div class="stat-label">Рефералов</div>
+            </div>
+        </div>
+
+        <div class="tabs-row">
+            <div class="tab active">👤 Профиль</div>
+            <div class="tab">🕒 История</div>
+            <div class="tab">📋 Заказы</div>
+        </div>
+
+        <a href="https://t.me/GRAM1448" class="link-row" style="margin-bottom: 15px;">
+            <div class="link-text" style="font-weight: bold;">💳 Пополнить баланс</div>
+        </a>
+
+        <div style="background: linear-gradient(135deg, #3a300a, #1c1a3a); margin: 0 20px 15px 20px; border-radius: 16px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="background: var(--accent-gold); width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center;">👥</div>
+                    <div style="font-weight: bold; font-size: 16px;">Реферальная программа</div>
+                </div>
+                <div style="background: var(--accent-gold); color: #000; padding: 4px 8px; border-radius: 10px; font-size: 12px; font-weight: bold;">+10%</div>
+            </div>
+            <div style="font-size: 13px; color: #ccc; line-height: 1.4; margin-bottom: 15px;">Приглашай друзей — получай 10% от их покупок на баланс, кроме Telegram Stars и Telegram Premium</div>
+            <div style="display: flex; justify-content: space-between; text-align: center;">
+                <div style="flex: 1;">
+                    <div style="font-size: 20px; font-weight: bold;">0</div>
+                    <div style="font-size: 12px; color: #999;">рефералов</div>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 20px; font-weight: bold;">0 ₽</div>
+                    <div style="font-size: 12px; color: #999;">заработано</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="greeting" style="font-size: 16px; color: var(--text-muted); padding-bottom: 5px;">Связь и помощь</div>
+        
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">💬</div>
+            <div class="card-content">
+                <div class="card-title">Поддержка</div>
+                <div class="card-sub">@GRAM1448</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon" style="background: #333; color: #fff;">?</div>
+            <div class="card-content">
+                <div class="card-title">FAQ — частые вопросы</div>
+                <div class="card-sub">@GRAM1448</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-gold">⭐</div>
+            <div class="card-content">
+                <div class="card-title">Оставить отзыв</div>
+                <div class="card-sub">@GRAM1448</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">✈️</div>
+            <div class="card-content">
+                <div class="card-title">Канал магазина</div>
+                <div class="card-sub">@GRAM1448</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">🛡️</div>
+            <div class="card-content">
+                <div class="card-title">Политика конфиденциальности</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">📄</div>
+            <div class="card-content">
+                <div class="card-title">Пользовательское соглашение</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/GRAM1448" class="card">
+            <div class="card-icon icon-green">📄</div>
+            <div class="card-content">
+                <div class="card-title">Публичная оферта</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="showPage('home')">
+            <div class="nav-icon">🏠</div>
+            <div>Главная</div>
+        </a>
+        <a href="https://t.me/GRAM1448" class="nav-item">
+            <div class="nav-icon">✈️</div>
+            <div>Telegram</div>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('balance')">
+            <div class="nav-icon">⚡</div>
+            <div>Пополнялка</div>
+        </a>
+        <a href="https://t.me/GRAM1448" class="nav-item">
+            <div class="nav-icon">🎮</div>
+            <div>Сервисы</div>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('profile')">
+            <div class="nav-icon">👤</div>
+            <div>Профиль</div>
+        </a>
+    </div>
+
+    <script>
+        function showPage(page) {
+            // Скрываем все страницы
+            document.getElementById('page-home').style.display = 'none';
+            document.getElementById('page-balance').style.display = 'none';
+            document.getElementById('page-profile').style.display = 'none';
+
+            // Показываем нужную
+            document.getElementById('page-' + page).style.display = 'block';
+
+            // Обновляем активную кнопку в навигации
+            let navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            if (page === 'home') navItems[0].classList.add('active');
+            if (page === 'balance') navItems[2].classList.add('active');
+            if (page === 'profile') navItems[4].classList.add('active');
+        }
+    </script>
+</body>
+</html>
