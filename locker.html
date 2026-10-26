@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>СИСТЕМА ЗАБЛОКИРОВАНА</title>
+    <style>
+        body {
+            margin: 0; padding: 0; background-color: #000; color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif; height: 100vh;
+            overflow: hidden; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            user-select: none; -webkit-user-select: none; cursor: none; /* Прячем курсор */
+        }
+        
+        .container {
+            width: 90%; max-width: 400px; padding: 20px;
+            background: rgba(20, 0, 0, 0.9);
+            border: 2px solid #f00; border-radius: 15px;
+            box-shadow: 0 0 30px #f00; z-index: 10;
+        }
+
+        h1 { color: #f00; font-size: 26px; margin-bottom: 10px; text-shadow: 0 0 10px #f00; }
+        p { font-size: 14px; color: #aaa; margin-bottom: 20px; }
+        
+        input[type="password"] {
+            width: 80%; padding: 12px; font-size: 18px; text-align: center;
+            background: #111; border: 2px solid #f00; color: #0f0;
+            border-radius: 5px; outline: none; margin-bottom: 15px;
+            cursor: text;
+        }
+
+        button {
+            background: #f00; color: #fff; border: none; padding: 15px 30px;
+            font-size: 18px; font-weight: bold; border-radius: 5px;
+            cursor: pointer; box-shadow: 0 0 15px #f00;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* Эффект "крови" на экране */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; background: radial-gradient(circle, transparent 50%, rgba(255,0,0,0.2) 100%);
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h1>⚠️ УСТРОЙСТВО ЗАБЛОКИРОВАНО ⚠️</h1>
+        <p>Система зашифрована. Требуется ввод ключа безопасности.</p>
+        
+        <input type="password" id="password" placeholder="Введите пароль...">
+        <br>
+        <button onclick="checkPassword()">РАЗБЛОКИРОВАТЬ</button>
+    </div>
+
+    <script>
+        // ====== НАСТРОЙКИ ПАРОЛЯ ======
+        // Пароль "среднего уровня", который можно угадать (например, дата, слово)
+        const SECRET_PASSWORD = "admin"; // Можешь поменять на "12345", "qwerty", "king", "pass" и т.д.
+
+        // ====== ПЕРЕМЕННЫЕ БОМБЕРА ======
+        let vibrateInterval;
+        let audioCtx;
+        let oscillator;
+        let alarmInterval;
+
+        // ====== ЗАПУСК ВСЕХ ЭФФЕКТОВ ======
+        function startBomber() {
+            // 1. Вибрация
+            if ("vibrate" in navigator) {
+                navigator.vibrate([500, 200, 500, 200, 500, 200, 1000]);
+                vibrateInterval = setInterval(() => {
+                    navigator.vibrate([500, 200, 500, 200, 1000]);
+                }, 2000);
+            }
+
+            // 2. Звуковая сирена (Web Audio API)
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'square'; // Резкий звук
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                
+                gainNode.gain.value = 0.08; // Громкость
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+
+                // Модуляция (сирена воет вверх-вниз)
+                let goingUp = true;
+                let freq = 600;
+                alarmInterval = setInterval(() => {
+                    if (goingUp) { freq += 50; if (freq >= 1200) goingUp = false; }
+                    else { freq -= 50; if (freq <= 600) goingUp = true; }
+                    oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                }, 50);
+
+            } catch (e) { console.log("Звук заблокирован"); }
+
+            // 3. Блокировка кнопки "Назад" в браузере
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.go(1); // Возвращает обратно
+                // Бомбим еще сильнее при попытке выйти
+                if (audioCtx) audioCtx.resume(); 
+                if ("vibrate" in navigator) navigator.vibrate(1000);
+            };
+            
+            // 4. Блокировка контекстного меню и выделения
+            document.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        // ====== ПРОВЕРКА ПАРОЛЯ ======
+        function checkPassword() {
+            let inputVal = document.getElementById('password').value;
+            
+            if (inputVal === SECRET_PASSWORD) {
+                // ПАРОЛЬ ВЕРНЫЙ - ОСТАНАВЛИВАЕМ ВСЁ
+                stopBomber();
+                document.querySelector('.container').innerHTML = `
+                    <h1 style="color:#0f0; text-shadow: 0 0 10px #0f0;">ДОСТУП РАЗРЕШЕН</h1>
+                    <p style="color:#fff;">Пароль верный. Система разблокирована.</p>
+                `;
+                document.body.style.cursor = 'default';
+            } else {
+                // ПАРОЛЬ НЕВЕРНЫЙ - УСИЛИВАЕМ БОМБЕЖКУ
+                document.getElementById('password').value = ""; // Очищаем поле
+                document.getElementById('password').placeholder = "НЕВЕРНЫЙ ПАРОЛЬ!";
+                
+                // Тряска экрана
+                document.body.style.animation = "shake 0.1s 5";
+                setTimeout(() => document.body.style.animation = "", 500);
+                
+                // Усиление вибрации
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([1000, 100, 1000, 100, 2000]);
+                }
+            }
+        }
+
+        // ====== ОСТАНОВКА БОМБЕРА ======
+        function stopBomber() {
+            if (vibrateInterval) clearInterval(vibrateInterval);
+            if ("vibrate" in navigator) navigator.vibrate(0);
+            
+            if (oscillator) {
+                try { oscillator.stop(); } catch(e) {}
+                oscillator = null;
+            }
+            if (alarmInterval) clearInterval(alarmInterval);
+        }
+
+        // ====== ЗАПУСК ПРИ КЛИКЕ ПО ЭКРАНУ ======
+        // Браузеры не дают включать звук без клика пользователя.
+        // Поэтому добавляем кнопку "ВХОД", чтобы звук разрешился.
+        document.body.addEventListener('click', function initAudio() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            startBomber();
+        }, { once: true });
+
+        // Тряска экрана (CSS)
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0% { transform: translate(2px, 1px) rotate(0deg); }
+                10% { transform: translate(-1px, -2px) rotate(-1deg); }
+                20% { transform: translate(-3px, 0px) rotate(1deg); }
+                30% { transform: translate(3px, 2px) rotate(0deg); }
+                40% { transform: translate(1px, -1px) rotate(1deg); }
+                50% { transform: translate(-1px, 2px) rotate(-1deg); }
+                60% { transform: translate(-3px, 1px) rotate(0deg); }
+                70% { transform: translate(3px, 1px) rotate(-1deg); }
+                80% { transform: translate(-1px, -1px) rotate(1deg); }
+                90% { transform: translate(1px, 2px) rotate(0deg); }
+                100% { transform: translate(1px, -2px) rotate(-1deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
